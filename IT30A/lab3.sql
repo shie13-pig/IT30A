@@ -52,7 +52,6 @@ WHERE br.borrow_return_date is NULL
 ORDER BY br.borrow_date DESC;
 
 
-
 --Aug. 27, 2026
 
 select
@@ -64,7 +63,6 @@ select
         s.student_last_name
     ) as student_name,
     
-
     b.book_title,
     b.book_author,
     b.book_category,
@@ -85,7 +83,6 @@ UPDATE borrow
 SET borrow_return_date = CURRENT_TIMESTAMP
 WHERE borrow_id = 5 AND borrow_return_date IS NULL;
 
-
 select
     br.borrow_id,
     
@@ -95,7 +92,6 @@ select
         s.student_last_name
     ) as student_name,
     
-
     b.book_title,
     b.book_author,
     b.book_category,
