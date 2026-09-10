@@ -71,3 +71,33 @@ CREATE TABLE IF NOT EXISTS borrow(
 ) ENGINE=InnoDB 
 DEFAULT CHARSET=utf8mb4 
 COLLATE=utf8mb4_general_ci;
+
+-- Insert Statement:Students
+INSERT INTO students (
+    student_id,
+    student_first_name,
+    student_last_name,
+    student_course
+) VALUES
+    ('1','SHIELA PEARL', 'KINOYOG', 'BSIT'),
+    ('2','XIAN DENVER', 'KINOYOG', 'CRIMINOLOGY'),
+    ('3','GRACE', 'RACASA', 'BSIT');
+   
+-- Insert Statement:Books
+INSERT INTO books (
+    book_title,
+    book_author,
+    book_category
+) VALUES
+     ("ILOVEYOU SINCE 1892","binibining Mia","History"),
+    ("Salomi","binibining Mia","Histry"),
+    ("MY HUSBAND IS A MAFIA BOSS","Yanalovesyou","Action");
+
+-- Insert Statement:Borrow
+INSERT INTO borrow (
+    student_id,
+    book_id
+) VALUES
+    (1,2),
+    (2,1),
+    (3,3);
