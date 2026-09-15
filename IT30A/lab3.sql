@@ -9,7 +9,7 @@ create table books (
 
 
     insert into books (book_title,book_author,book_category) VALUES 
-    ("The Litte Prince","Antoine","Fiction"),
+    ("The Litte Princ","Antoine","Fiction"),
     ("Pride and Prejudice","Collins","Fiction"),
     ("The Alchemist","Paulo","Fiction");
 
