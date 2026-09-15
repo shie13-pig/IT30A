@@ -34,5 +34,4 @@ for /f "tokens=1-3 delims=/" %a in ("%date%") do set "dt=%c_%a_%b"
 for /f "tokens=1-3 delims=:." %a in ("%time%") do set "tm=%a_%b_%c"
 mysqldump -u root -p --databases lib_db > "C:\Users\Admin\Documents\kinoyog dev\backups\%dt%_%tm%_library_db.sql"
 
-
-laboratory #2
+laboratory 2
