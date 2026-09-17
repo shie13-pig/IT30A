@@ -77,7 +77,7 @@ th {
     <hr>
     <?php if($section=='students'): ?>
     <h2>Students</h2>
-    <table>
+     <table>
         <thead>
             <tr>
                 <th>ID</th>
