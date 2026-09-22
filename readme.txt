@@ -28,3 +28,5 @@ UPDATE students SET student_created_at = CURRENT_TIMESTAMP WHERE student_created
 ALTER TABLE students MODIFY COLUMN student_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 mysqldump -u root -p --databases it30a_lab_db > "D:\xampp\htdocs\IT30A\Backup\%date:~-4%_%date:~4,2%_%date:~7,2%_%time:~0,2%_%time:~3,2%_%time:~6,2%_it30a_lab_db.sql"
+
+// initial frontend
