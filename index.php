@@ -231,104 +231,31 @@ if($section==='books' && $action==='update'){
     }
 }
 
-//--------------------------------
-// Books
-//--------------------------------
+// Fetch Borrow Records
 
-if($section === 'books'){
-    $stmt = $pdo->query("
-        SELECT *
+if($section === 'borrow'){
+    // Fetch Students for borrow form
+    $stmt=$pdo->query("
+        SELECT
+            student_id,
+            student_first_name,
+            student_last_name
+        FROM students
+        ORDER by student_last_name,student_first_name
+    ");
+    $students = $stmt->fetchAll();
+    // Fecth Books for borrow form
+
+    $stmt=$pdo->query("
+        SELECT
+            book_id,
+            book_title,
+            book_author
         FROM books
-        ORDER by book_id DESC
-        ");
-
-        $books = $stmt->fetchAll();
-}
-
-// Create Book
-if($section==='books' && $action==='create'){
-    if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        $bookTitle = trim($_POST['book_title'] ?? '');
-        $bookAuthor = trim($_POST['book_author'] ?? '');
-        $category = trim($_POST['book_category'] ?? '');
-        if($bookTitle !== '' && $bookAuthor !='' && $category !==''){
-
-        $sql=("
-            INSERT INTO books (
-                book_title,
-                book_author,
-                book_category
-            )
-            VALUES (?,?,?)
-        ");
-
-      $stmt = $pdo->prepare($sql);
-
-        $stmt->execute([
-            $bookTitle,
-            $bookAuthor,
-            $category
-        ]);
-
-         $_SESSION['alert'] = 'Book Saved Successfully';
-
-        header("Location: index.php?section=books");
-        exit;
-
-
-        }
-    }
-
-}
-
-// Update Books
-if($section==='books' && $action==='update'){
-    $book_id = (int) ($_GET['id'] ?? 0);
-
-    // Retrieve Student Information
-    $stmt = $pdo->prepare("
-        SELECT *
-        FROM books
-        WHERE book_id = ?
+        ORDER by book_title
     ");
 
-    $stmt->execute([$book_id]);
-
-    $book = $stmt->fetch();
-
-    // Update Book Info
-    if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        $bookTitle = trim($_POST['book_title'] ?? '');
-        $bookAuthor = trim($_POST['book_author'] ?? '');
-        $category = trim($_POST['book_category'] ?? '');
-        if($bookTitle !== '' && $bookAuthor !='' && $category !==''){
-
-        $sql =("
-            UPDATE books
-            SET
-                book_title=?,
-                book_author=?,
-                book_category =?
-            WHERE book_id =?
-        ");
-
-      $stmt = $pdo->prepare($sql);
-
-        $stmt->execute([
-            $bookTitle,
-            $bookAuthor,
-            $category,
-            $book_id
-        ]);
-
-         $_SESSION['alert'] = 'Book Updated Successfully';
-
-        header("Location: index.php?section=books");
-        exit;
-
-
-        }
-    }
+    $books = $stmt->fetchALL();
 }
 
 // Borrow a Book
@@ -393,6 +320,7 @@ if($section==='books' && $action==='update'){
             exit;
         }
     }
+
 ?>
 
 <!DOCTYPE html>
