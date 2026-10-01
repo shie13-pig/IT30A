@@ -6,7 +6,7 @@ $user = 'root';
 $pass = '';
 $charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host; dbname=$db; charset=$charset";
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -14,70 +14,124 @@ $options = [
     PDO::ATTR_EMULATE_PREPARES => false
 ];
 
-try{
+try {
     $pdo = new PDO($dsn, $user, $pass, $options);
-}catch(PDOException $e){
+} catch(PDOException $e) {
     die("Database connection failed" . $e->getMessage());
 }
 
-// Session
+//Session
 session_start();
 
-// Determine current section
+//Determine current section
 $section = $_GET['section'] ?? 'students';
 
-// CRUD Operations
+//CRUD Operations
 $action = $_GET['action'] ?? '';
 
-//----------------------------------
-//Students
-//----------------------------------
+//------------------------------------------
+// Students
+//------------------------------------------
 
 //Fetch students
 if($section === 'students'){
     $stmt = $pdo->query("
         SELECT *
         FROM students
-        ORDER by student_id
-        ");
+        ORDER by student_id DESC
+    ");
 
-        $students = $stmt->fetchAll();
+    $students = $stmt->fetchAll();
 }
- //Create student
- if($section==='students' && $action==='create'){
 
+// Create Student
+if($section==='students' && $action==='create'){
     if($_SERVER['REQUEST_METHOD'] === 'POST'){
         $firstName = trim($_POST['student_first_name'] ?? '');
         $lastName = trim($_POST['student_last_name'] ?? '');
         $course = trim($_POST['student_course'] ?? '');
+        if($firstName !== '' && $lastName !== '' && $course !== ''){
 
-        if($firstName !== '' && $lastName !=='' && $course !==''){
+            $sql=("
+                INSERT INTO students (
+                    student_first_name,
+                    student_last_name,
+                    student_course
+                ) 
+                    VALUES (?,?,?)
+                ");
 
-        $sql=("
-            INSERT INTO students (
-                student_first_name,
-                student_last_name,
-                student_course
-            )
-            VALUES (?,?,?)
-         ");
+            $stmt = $pdo->prepare($sql);
 
-         $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                $firstName, 
+                $lastName, 
+                $course
+            ]);
 
-         $stmt->execute([
-            $firstName,
-            $lastName,
-            $course
-         ]);
 
-        // $_SESSION['alert'] = 'Student Saved Successfully';
-         
-         header("Location: index.php?section=students");
-         exit;
+            // $_SESSION['alert'] = 'Student Saved Successfully';
+            header("Location: index.php?section=students");
+            exit();
 
         }
     }
- }
+
+}
+
+// Update Student
+if($section==='students' && $action==='update'){
+    $studentId = (int) ($_GET['id'] ?? 0);
+
+
+    // Retrieve Student Infromation
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM students
+        WHERE student_id = ?
+    ");
+
+    $stmt->execute([$studentId]);
+
+    $student = $stmt->fetch();
+
+    // Update Student Info
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+        $firstName = trim($_POST['student_first_name'] ?? '');
+        $lastName = trim($_POST['student_last_name'] ?? '');
+        $course = trim($_POST['student_course'] ?? '');
+
+        if($firstName !== '' && $lastName !== '' && $course !== ''){
+
+            $sql=("
+                UPDATE students
+                SET 
+                    student_first_name = ?,
+                    student_last_name = ?,
+                    student_course =?
+                WHERE student_id = ?
+            ");
+
+            $stmt = $pdo->prepare($sql);
+
+            $stmt->execute([
+                $firstName, 
+                $lastName, 
+                $course,
+                $studentId
+            ]);
+
+
+            $_SESSION['alert'] = 'Student Updated Successfully';
+
+            header("Location: index.php?section=students");
+            exit();
+
+        }
+    }
+
+    
+}
 ?>
 
 <!DOCTYPE html>
@@ -96,105 +150,158 @@ if($section === 'students'){
     </nav>
     <hr>
     <?php if($section==='students'): ?>
-    <h1>Students</h1>
-    <p>
-        <a href="index.php?section=students&action=create">
-            Add Student
-        </a>
-    </p>
-
-    <?php if($action==='create'): ?>
-    
-    <h2>Add student</h2>
-
-    <form method="POST">
+        <h1>Students</h1>
         <p>
-            <label>First Name</label>
-            <br>
-            <input type="text"
-               name="student_first_name"
-               required
-        />
+            <a href="index.php?section=students&action=create">
+                Add Student
+            </a>
         </p>
-        <p>
-            <label>Last Name</label>
-            <br>
-            <input type="text"
-                   name="student_last_name"
-                   required
-            />
-        </p>
-         <p>
-            <label>Course</label>
-            <br>
-            <input type="text"
-                   name="student_course"
-                   required
-            />
-        </p>
-        <button type="submit">
-            Save
-        </button>
 
-        <a href="index.php?section=students">
-            Cancel
-        </a>
-    </form>
-    <?php else: ?>
+        <?php if($action==='create'): ?>
 
-     <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Course</th>
-                <th>Created At</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach($students as $student): ?>
+            <h2>Add students</h2>
 
-            <tr>
-                <td>
-                    <?= htmlspecialchars($student['student_id']) ?>
-                </td>
-                <td>
-                    <?= htmlspecialchars($student['student_first_name']) ?>
-                </td>
-                <td>
-                    <?= htmlspecialchars($student['student_last_name']) ?>
-                </td>
-                <td>
-                    <?= htmlspecialchars($student['student_course']) ?>
-                </td>
-                <td>
-                    <?= htmlspecialchars($student['student_created_at']) ?>
-                </td>
-                <td>
-                    <a>Edit</a>
-                    |
-                    <a>Delete</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            <form method="POST"> 
+                <p>
+                    <label>First Name</label>
+                    <br>
+                    <input type="text" 
+                        name="student_first_name"
+                        required
+                />
+                </p>
+                <p>
+                    <label>Last Name</label>
+                    <br>
+                    <input type="text" 
+                    name="student_last_name"
+                    required
+                />
+                </p>
+                <p>
+                    <label>Course</label>
+                    <br>
+                    <input type="text" 
+                    name="student_course"
+                    required
+                />
+                </p>
+
+                <button type="submit">
+                    Save
+                </button>
+
+                <a href="index.php?section=students">
+                    Cancel
+                </a>
+            </form>
+
+        <?php elseif($action==='update'): ?>
+                
+            <h2>Update Student</h2>
+
+            <form method="POST"> 
+                <p>
+                    <label>First Name</label>
+                    <br>
+                    <input type="text" 
+                        name="student_first_name"
+                        value="<?= htmlspecialchars($student['student_first_name']) ?>"
+                        required
+                />
+                </p>
+                <p>
+                    <label>Last Name</label>
+                    <br>
+                    <input type="text" 
+                    name="student_last_name"
+                    value="<?= htmlspecialchars($student['student_last_name']) ?>"
+                    required
+                />
+                </p>
+                <p>
+                    <label>Course</label>
+                    <br>
+                    <input type="text" 
+                    name="student_course"
+                    value="<?= htmlspecialchars($student['student_course']) ?>"
+                    required
+                />
+                </p>
+
+                <button type="submit">
+                    Update
+                </button>
+
+                <a href="index.php?section=students">
+                    Cancel
+                </a>
+            </form>
+
+
+
+
+
+        <?php else: ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Course</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($students as $student): ?>
+                        <tr>
+                            <td> 
+                                <?= htmlspecialchars($student['student_id']) ?>
+                            </td>
+                            <td> 
+                                <?= htmlspecialchars($student['student_first_name']) ?>
+                            </td>
+                            <td> 
+                                <?= htmlspecialchars($student['student_last_name']) ?>
+                            </td>
+                            <td> 
+                                <?= htmlspecialchars($student['student_course']) ?>
+                            </td>
+                            <td> 
+                                <?= htmlspecialchars($student['student_created_at']) ?>
+                            </td>
+                            <td> 
+                                <a href="index.php?section=students&action=update&id=<?= $student['student_id'] ?>">Edit</a>
+                                |
+                                <a>Delete</a>
+                            </td>
+
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
     <?php endif; ?>
 
-     <?php endif; ?>
-    
-    <?php if($section=='books'): ?>
-        <h2>Books</h2>
+    <?php if($section==='books'): ?>
+        <h1>Books</h1>
     <?php endif; ?>
-    
-    <?php if($section=='borrow'): ?>
-        <h2>Borrow</h2>
+
+    <?php if($section==='borrow'): ?>
+        <h1>Borrow</h1>
     <?php endif; ?>
 
 </body>
-</html>
 
+<?php if (isset($_SESSION['alert'])): ?>
+    <script>
+        alert(<?=json_encode($_SESSION['alert']) ?>);
+    </script>
 
+    <?php unset($_SESSION['alert']); ?>
 
+<?php endif; ?>
+</html>                        
