@@ -331,37 +331,68 @@ if($section==='books' && $action==='update'){
     }
 }
 
-//--------------------------------
-// Borrow
-//--------------------------------
+// Borrow a Book
+ if($_SERVER['REQUEST_METHOD'] === 'POST'){
+        
+        $studentId = (int)($_POST['student_id'] ?? 0);
+        $bookId = (int)($_POST['book_id'] ?? 0);
 
-// Fetch Borrow Records
+        if($studentId > 0 && $bookId > 0){
+            
+            // Check if student has an unreturned book
+            $stmt = $pdo->prepare("
+                SELECT borrow_id
+                FROM borrow
+                WHERE student_id=?
+                  AND borrow_return_date IS NULL
+                LIMIT 1
+            ");
 
-if($section === 'borrow'){
-    // Fetch Students for borrow form
-    $stmt=$pdo->query("
-        SELECT
-            student_id,
-            student_first_name,
-            student_last_name
-        FROM students
-        ORDER by student_last_name,student_first_name
-    ");
-    $students = $stmt->fetchAll();
-    // Fecth Books for borrow form
+            $stmt->execute([$studentId]);
+            $studentBorrow = $stmt->fetch();
 
-    $stmt=$pdo->query("
-        SELECT
-            book_id,
-            book_title,
-            book_author
-        FROM books
-        ORDER by book_title
-    ");
+            if($studentBorrow){
+                $_SESSION['alert'] = 'This student cannot borrow another book because a previous book has not been returned';
+            } else {
+                
+                // Check if book is already returned
+                $stmt = $pdo->prepare("
+                    SELECT borrow_id
+                    FROM borrow
+                    WHERE book_id=?
+                      AND borrow_return_date IS NULL
+                    LIMIT 1
+                ");
 
-    $books = $stmt->fetchALL();
-}
+                $stmt->execute([$bookId]);
+                $bookBorrow = $stmt->fetch();
 
+                if($bookBorrow){
+                    $_SESSION['alert'] = 'This book cannot be borrowed because it has not been returned';
+                }else{
+                    
+                    // Create borrow record finally
+                    $stmt = $pdo->prepare("
+                        INSERT INTO borrow(
+                            student_id,
+                            book_id
+                        )
+                        VALUES(?,?)
+                    ");
+
+                    $stmt->execute([
+                        $studentId,
+                        $bookId
+                    ]);
+
+                    $_SESSION['alert'] = 'Book borrowed successfully';
+                }
+            
+            }
+            header("Location: index.php?section=borrow");
+            exit;
+        }
+    }
 ?>
 
 <!DOCTYPE html>
