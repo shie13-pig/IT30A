@@ -232,6 +232,106 @@ if($section==='books' && $action==='update'){
 }
 
 //--------------------------------
+// Books
+//--------------------------------
+
+if($section === 'books'){
+    $stmt = $pdo->query("
+        SELECT *
+        FROM books
+        ORDER by book_id DESC
+        ");
+
+        $books = $stmt->fetchAll();
+}
+
+// Create Book
+if($section==='books' && $action==='create'){
+    if($_SERVER['REQUEST_METHOD'] === 'POST'){
+        $bookTitle = trim($_POST['book_title'] ?? '');
+        $bookAuthor = trim($_POST['book_author'] ?? '');
+        $category = trim($_POST['book_category'] ?? '');
+        if($bookTitle !== '' && $bookAuthor !='' && $category !==''){
+
+        $sql=("
+            INSERT INTO books (
+                book_title,
+                book_author,
+                book_category
+            )
+            VALUES (?,?,?)
+        ");
+
+      $stmt = $pdo->prepare($sql);
+
+        $stmt->execute([
+            $bookTitle,
+            $bookAuthor,
+            $category
+        ]);
+
+         $_SESSION['alert'] = 'Book Saved Successfully';
+
+        header("Location: index.php?section=books");
+        exit;
+
+
+        }
+    }
+
+}
+
+// Update Books
+if($section==='books' && $action==='update'){
+    $book_id = (int) ($_GET['id'] ?? 0);
+
+    // Retrieve Student Information
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM books
+        WHERE book_id = ?
+    ");
+
+    $stmt->execute([$book_id]);
+
+    $book = $stmt->fetch();
+
+    // Update Book Info
+    if($_SERVER['REQUEST_METHOD'] === 'POST'){
+        $bookTitle = trim($_POST['book_title'] ?? '');
+        $bookAuthor = trim($_POST['book_author'] ?? '');
+        $category = trim($_POST['book_category'] ?? '');
+        if($bookTitle !== '' && $bookAuthor !='' && $category !==''){
+
+        $sql =("
+            UPDATE books
+            SET
+                book_title=?,
+                book_author=?,
+                book_category =?
+            WHERE book_id =?
+        ");
+
+      $stmt = $pdo->prepare($sql);
+
+        $stmt->execute([
+            $bookTitle,
+            $bookAuthor,
+            $category,
+            $book_id
+        ]);
+
+         $_SESSION['alert'] = 'Book Updated Successfully';
+
+        header("Location: index.php?section=books");
+        exit;
+
+
+        }
+    }
+}
+
+//--------------------------------
 // Borrow
 //--------------------------------
 
@@ -261,69 +361,6 @@ if($section === 'borrow'){
 
     $books = $stmt->fetchALL();
 }
-
-// Borrow a Book
- if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        
-        $studentId = (int)($_POST['student_id'] ?? 0);
-        $bookId = (int)($_POST['book_id'] ?? 0);
-
-        if($studentId > 0 && $bookId > 0){
-            
-            // Check if student has an unreturned book
-            $stmt = $pdo->prepare("
-                SELECT borrow_id
-                FROM borrow
-                WHERE student_id=?
-                  AND borrow_return_date IS NULL
-                LIMIT 1
-            ");
-
-            $stmt->execute([$studentId]);
-            $studentBorrow = $stmt->fetch();
-
-            if($studentBorrow){
-                $_SESSION['alert'] = 'This student cannot borrow another book because a previous book has not been returned';
-            } else {
-                
-                // Check if book is already returned
-                $stmt = $pdo->prepare("
-                    SELECT borrow_id
-                    FROM borrow
-                    WHERE book_id=?
-                      AND borrow_return_date IS NULL
-                    LIMIT 1
-                ");
-
-                $stmt->execute([$bookId]);
-                $bookBorrow = $stmt->fetch();
-
-                if($bookBorrow){
-                    $_SESSION['alert'] = 'This book cannot be borrowed because it has not been returned';
-                }else{
-                    
-                    // Create borrow record finally
-                    $stmt = $pdo->prepare("
-                        INSERT INTO borrow(
-                            student_id,
-                            book_id
-                        )
-                        VALUES(?,?)
-                    ");
-
-                    $stmt->execute([
-                        $studentId,
-                        $bookId
-                    ]);
-
-                    $_SESSION['alert'] = 'Book borrowed successfully';
-                }
-            
-            }
-            header("Location: index.php?section=borrow");
-            exit;
-        }
-    }
 
 ?>
 
