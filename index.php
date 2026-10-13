@@ -751,7 +751,7 @@ if($section==='borrow' && $action==='return'){
                             <?php endif; ?>
                         </td>
                      <td>
-                            <?php if(!$borrow['borrow_return_date']): ?>
+                            <?php if($borrow['borrow_return_date']): ?>
 
                                  Returned
 
