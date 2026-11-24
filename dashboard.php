@@ -1,5 +1,4 @@
 <?php
-
 $host = 'localhost';
 $db   = 'it30_lab_db';
 $user = 'root';
@@ -25,12 +24,6 @@ try {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-</head>
-<body>
-    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library · Dashboard</title>
@@ -268,6 +261,7 @@ try {
         }
     </style>
 </head>
+<body>
     <?php include 'includes/navbar.php'; ?>
 </body>
 </html>
