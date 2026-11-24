@@ -123,3 +123,30 @@ function navActive($section,$currentSection){
 </nav>
 
 </header>
+
+<?php 
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+
+    <?php include 'includes/navbar.php' 
+    
+    // ---------- 1. KPI COUNTS ----------
+$studentCount  = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn();
+$bookCount     = $pdo->query("SELECT COUNT(*) FROM books")->fetchColumn();
+$totalBorrows  = $pdo->query("SELECT COUNT(*) FROM borrow")->fetchColumn();
+$activeBorrows = $pdo->query("SELECT COUNT(*) FROM borrow WHERE borrow_return_date IS NULL")->fetchColumn();
+
+?>
+    
+    
+</body>
+</html>
