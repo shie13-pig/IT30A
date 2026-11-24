@@ -283,60 +283,59 @@ while ($row = $catStmt->fetch()) {
 <body>
     <?php include 'includes/navbar.php'; ?>
 
-      <div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-header">
-            <span class="stat-label">Students</span>
-            <span class="material-icons">school</span>
+<h1 style="margin-bottom: 1.5rem; font-weight: 500; color: #212121;">Dashboard</h1>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">Students</span>
+                <span class="material-icons">school</span>
+            </div>
+            <div class="stat-number"><?= $studentCount ?></div>
+            <div class="stat-sub">enrolled</div>
         </div>
-        <div class="stat-number"><?= $studentCount ?></div>
-        <div class="stat-sub">enrolled</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-header">
-            <span class="stat-label">Books</span>
-            <span class="material-icons">auto_stories</span>
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">Books</span>
+                <span class="material-icons">auto_stories</span>
+            </div>
+            <div class="stat-number"><?= $bookCount ?></div>
+            <div class="stat-sub">in collection</div>
         </div>
-        <div class="stat-number"><?= $bookCount ?></div>
-        <div class="stat-sub">in collection</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-header">
-            <span class="stat-label">Borrow records</span>
-            <span class="material-icons">history</span>
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-label">Borrow records</span>
+                <span class="material-icons">history</span>
+            </div>
+            <div class="stat-number"><?= $totalBorrows ?></div>
+            <div class="stat-sub">all time</div>
         </div>
-        <div class="stat-number"><?= $totalBorrows ?></div>
-        <div class="stat-sub">all time</div>
-    </div>
-
     <div class="stat-card">
-        <div class="stat-header">
-            <span class="stat-label">Active loans</span>
-            <span class="material-icons">pending_actions</span>
-        </div>
-        <div class="stat-number"><?= $activeBorrows ?></div>
-        <div class="stat-sub">not returned</div>
-    </div>
+            <div class="stat-header">
+                <span class="stat-label">Active loans</span>
+                <span class="material-icons">pending_actions</span>
+            </div>
+            <div class="stat-number"><?= $activeBorrows ?></div>
+            <div class="stat-sub">not returned</div>
+</div>
     <!-- CHARTS -->
 <div class="charts-grid">
 
     <!-- Pie Chart - Book Categories-->
-    <div class="chart-card">
-        <div class="chart-title">
-            Books by category
-            <span>
-                <span class="material-icons">category</span>
-                collection
-            </span>
+        <div class="chart-card">
+            <div class="chart-title">
+                Books by category
+                <span>
+                    <span class="material-icons">category</span>
+                    collection
+                </span>
+            </div>
+            <canvas id="categoryChart" width="400" height="200"></canvas>
         </div>
-        <canvas id="categoryChart" width="400" height="200"></canvas>
-    </div>
-
-</div>
 
 <script>
+
+
+
     (function() {
         // Materialize standard palette
         const colors = {
