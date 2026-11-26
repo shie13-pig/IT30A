@@ -83,7 +83,7 @@ $recentBorrows = $recentStmt->fetchAll();
 </head>
 <body>
 <div class="dashboard">
-    <?php include 'includes/navbar.php'; ?>
+    <?php include 'C:\xampp\htdocs\IT30A\includes'; ?>
     <h1 style="margin-bottom: 1.5rem; font-weight: 500; color: #212121;">Dashboard</h1>
     <div class="stats-grid">
         <div class="stat-card">
